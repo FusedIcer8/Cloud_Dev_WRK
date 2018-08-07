@@ -2,7 +2,7 @@
 ---
 # This playbook runs traditional setup processes fot a 2012 server
 
-- name: SEtup Tasks (replaces sccm tasks)
+- name: Setup Tasks (replaces sccm tasks)
   hosts: all
   gather_facts: false
   tasks:
