@@ -1,58 +1,55 @@
 
-- name: Remove installed KB2966828
-  ignore_errors: yes
-  win_hotfix:
-    hotfix_kb: KB2966828
-    state: absent
-  register: hotfix_uninstall
+---
+# This playbook runs traditional setup processes fot a 2012 server
 
-- name: Remove installed KB2966828
-  ignore_errors: yes
-  win_hotfix:
-    hotfix_kb: KB2966827
-    state: absent
-  register: hotfix_uninstall
+- name: Setup Tasks (replaces sccm tasks)
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Install KB3123479
+      win_hotfix:
+        hotfix_kb: KB3123479
+        source: C:\temp\Windows6.1-KB3123479-x64.msu
+        state: present
+      register: hotfix_install
 
-- name: Remove installed KB2966826
-   ignore_errors: yes
-   win_hotfix:
-    hotfix_kb: KB2966826
-    state: absent
-  register: hotfix_uninstall
+     - name: Install all security, critical, and rollup updates
+       win_updates:
+        category_names:
+          - SecurityUpdates
+          - CriticalUpdates
+          - UpdateRollups
 
-- name: Install windows DotNet 3.5 FrameWork
-  ignore_errors: yes
-  win_feature:
-    name: Net-Framework-Core
-    state: present
+      - name: Install the Visual C thingy
+        win_package:
+          path: http://download.microsoft.com/download/1/6/B/16B06F60-3B20-4FF2-B699-5E9B7962F9AE/VSU_4/vcredist_x64.exe
+          product_id: '{CF2BEA3C-26EA-32F8-AA9B-331F7E34BA97}'
+          arguments: /install /passive /norestart
 
-- name: Change the hostname to new_hostname
-  win_hostname:
-    name: variable ($Desc)
+      - name: Install windows DotNet 3.5 FrameWork
+        ignore_errors: yes
+        win_feature:
+          name: Net-Framework-Core
+          state: present
 
-- name: Query pagefiles configuration
-  win_pagefile:
+      - name: Install Microsoft NET Framework 4.6.1
+        win_package:
+          path: "https://download.microsoft.com/download/E/4/1/E4173890-A24A-4936-9FC9-AF930FE3FA40/NDP461-KB3102436-x86-x64-AllOS-ENU.exe"
+          product_id: '{BD6F5371-DAC1-30F0-9DDE-CAC6791E28C3}'
+          state: present
+          arguments: /q /norestart
 
-- name: Query C pagefile
-  win_pagefile:
-    drive: C
+      - name: Install Silverlight
+        win_package:
+          path: https://download.microsoft.com/download/F/D/0/FD0B0093-DE8A-4C4E-BDC4-F0C56D72018C/50907.00/Silverlight_x64.exe
+          state: present
 
-- name: Set C pagefile, override if exists
-  win_pagefile:
-    drive: C
-    initial_size: 8192
-    maximum_size: 8192
-    override: no
-    state: present
+      - name: Install Windows Management Framework 5.1
+        win_package:
+          path: https://download.microsoft.com/download/6/F/5/6F5FF66C-6775-42B0-86C4-47D41F2DA187/W2K12-KB3191565-x64.msu
+          state: present
+          arguements: /q /norestart
 
-- name: Set timezone to 'Central Standard Time' (GMT-06:00)
-  win_timezone:
-    timezone: Central Standard Time
+      - name: copy SXS Directory
 
-#- name: Install all security, critical, and rollup updates
- # win_updates:
-  #  category_names:
-   #   - SecurityUpdates
-    #  - CriticalUpdates
-     # - UpdateRollups
-
+      - name: Add reg keys for security fixes (need additional information)
