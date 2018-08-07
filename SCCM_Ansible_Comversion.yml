@@ -11,7 +11,7 @@
         name: WOW64
         data: "0"
         type: string
-#
+
     - name: Uninstall KB:2966828
       ignore_errors: yes
       win_hotfix:
