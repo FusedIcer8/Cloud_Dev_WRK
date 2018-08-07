@@ -2,7 +2,7 @@
 ---
 # This playbook runs traditional setup processes fot a 2012 server
 
-- name: SEtup Tasks (replaces sccm tasks)
+- name: Setup Tasks (replaces sccm tasks)
   hosts: all
   gather_facts: false
   tasks:
@@ -32,4 +32,24 @@
           name: Net-Framework-Core
           state: present
 
+      - name: Install Microsoft NET Framework 4.6.1
+        win_package:
+          path: "https://download.microsoft.com/download/E/4/1/E4173890-A24A-4936-9FC9-AF930FE3FA40/NDP461-KB3102436-x86-x64-AllOS-ENU.exe"
+          product_id: '{BD6F5371-DAC1-30F0-9DDE-CAC6791E28C3}'
+          state: present
+          arguments: /q /norestart
 
+      - name: Install Silverlight
+        win_package:
+          path: https://download.microsoft.com/download/F/D/0/FD0B0093-DE8A-4C4E-BDC4-F0C56D72018C/50907.00/Silverlight_x64.exe
+          state: present
+
+      - name: Install Windows Management Framework 5.1
+        win_package:
+          path: https://download.microsoft.com/download/6/F/5/6F5FF66C-6775-42B0-86C4-47D41F2DA187/W2K12-KB3191565-x64.msu
+          state: present
+          arguements: /q /norestart
+
+      - name: copy SXS Directory
+
+      - name: Add reg keys for security fixes (need additional information)
