@@ -1,4 +1,5 @@
 
+#
 - name: Remove installed KB2966828
   ignore_errors: yes
   win_hotfix:
