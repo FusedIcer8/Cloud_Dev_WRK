@@ -1,59 +1,94 @@
 
+---
+-
+ 
+  host: tag_function_db
+  task:
+    - name: Disable 64-bit file system redirection 
+      ignore_errors: yes
+      win_regedit:
+        path: HKLM:\System\CurrentControlSet\Services\msiserver
+        name: WOW64
+        data: "0"
+        type: string
 #
-- name: Remove installed KB2966828
-  ignore_errors: yes
-  win_hotfix:
-    hotfix_kb: KB2966828
-    state: absent
-  register: hotfix_uninstall
+    - name: Uninstall KB:2966828
+      ignore_errors: yes
+      win_hotfix:
+        hotfix_identifier: Package_for_KB2966828~31bf3856ad364e35~amd64~~6.3.1.4
+        state: absent
+      register: hotfix_uninstall
 
-- name: Remove installed KB2966828
-  ignore_errors: yes
-  win_hotfix:
-    hotfix_kb: KB2966827
-    state: absent
-  register: hotfix_uninstall
+    - name: Uninstall KB:2966827
+      ignore_errors: yes
+      win_hotfix: 
+        hotfix_kb: KB2966827
+        state: absent
+      register: hotfix_uninstall
 
-- name: Remove installed KB2966826
-   ignore_errors: yes
-   win_hotfix:
-    hotfix_kb: KB2966826
-    state: absent
-  register: hotfix_uninstall
+    - name: Uninstall KB:2966826
+      ignore_errors: yes
+      win_hotfix:
+        hotfix_identifier: Package_for_KB2966826~31bf3856ad364e35~amd64~~6.3.1.7
+        state: absent
+      register: hotfix_uninstall
 
-- name: Install windows DotNet 3.5 FrameWork
-  ignore_errors: yes
-  win_feature:
-    name: Net-Framework-Core
-    state: present
+   - name: Install the Visual C thingy
+       win_package:
+        path: http://download.microsoft.com/download/1/6/B/16B06F60-3B20-4FF2-B699-5E9B7962F9AE/VSU_4/vcredist_x64.exe
+        product_id: '{CF2BEA3C-26EA-32F8-AA9B-331F7E34BA97}'
+        arguments: /install /passive /norestart
 
-- name: Change the hostname to new_hostname
-  win_hostname:
-    name: variable ($Desc)
+    - name: Install Silverlight
+      win_package:
+        path: https://download.microsoft.com/download/F/D/0/FD0B0093-DE8A-4C4E-BDC4-F0C56D72018C/50907.00/Silverlight_x64.exe
+        state: present
 
-- name: Query pagefiles configuration
-  win_pagefile:
+    - name: PowerShell execution policy = Bypass
+      ignore_errors: yes
+      win_shell: Set-ExecutionPolicy -ExecutionPolicy Bypass
 
-- name: Query C pagefile
-  win_pagefile:
-    drive: C
+    - name: Change the hostname to new_hostname
+      win_hostname:
+        name: variable ($Desc)
 
-- name: Set C pagefile, override if exists
-  win_pagefile:
-    drive: C
-    initial_size: 8192
-    maximum_size: 8192
-    override: no
-    state: present
+    - name: Query pagefiles configuration
+      win_pagefile:
 
-- name: Set timezone to 'Central Standard Time' (GMT-06:00)
-  win_timezone:
-    timezone: Central Standard Time
+    - name: Query C pagefile
+      win_pagefile:
+        drive: C
 
-#- name: Install all security, critical, and rollup updates
- # win_updates:
-  #  category_names:
-   #   - SecurityUpdates
-    #  - CriticalUpdates
-     # - UpdateRollups
+    - name: Set C pagefile, override if exists
+      win_pagefile:
+        drive: C
+        initial_size: 8192
+        maximum_size: 8192
+        override: no
+        state: present
+
+    - name: Install all security, critical, and rollup updates
+      win_updates:
+      category_names:
+        - SecurityUpdates
+        - CriticalUpdates
+        - UpdateRollups
+
+  - name: Install NET-Framework-3.5
+     ignore_errors: yes
+      win_feature:
+        name: NET-Framework-Core
+        include_management_tools: yes
+        source: c:\Windows\sxs
+        state: present
+
+#- name: Set timezone to 'Central Standard Time' (GMT-06:00)
+ # win_timezone:
+  #  timezone: Central Standard Time
+
+#- name: copy SXS Directory
+
+#- name: Add reg keys for security fixes (need additional information)
+
+...
 
