@@ -1,58 +1,35 @@
 
-- name: Remove installed KB2966828
-  ignore_errors: yes
-  win_hotfix:
-    hotfix_kb: KB2966828
-    state: absent
-  register: hotfix_uninstall
+---
+# This playbook runs traditional setup processes fot a 2012 server
 
-- name: Remove installed KB2966828
-  ignore_errors: yes
-  win_hotfix:
-    hotfix_kb: KB2966827
-    state: absent
-  register: hotfix_uninstall
+- name: SEtup Tasks (replaces sccm tasks)
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Install KB3123479
+      win_hotfix:
+        hotfix_kb: KB3123479
+        source: C:\temp\Windows6.1-KB3123479-x64.msu
+        state: present
+      register: hotfix_install
 
-- name: Remove installed KB2966826
-   ignore_errors: yes
-   win_hotfix:
-    hotfix_kb: KB2966826
-    state: absent
-  register: hotfix_uninstall
+     - name: Install all security, critical, and rollup updates
+       win_updates:
+        category_names:
+          - SecurityUpdates
+          - CriticalUpdates
+          - UpdateRollups
 
-- name: Install windows DotNet 3.5 FrameWork
-  ignore_errors: yes
-  win_feature:
-    name: Net-Framework-Core
-    state: present
+      - name: Install the Visual C thingy
+        win_package:
+          path: http://download.microsoft.com/download/1/6/B/16B06F60-3B20-4FF2-B699-5E9B7962F9AE/VSU_4/vcredist_x64.exe
+          product_id: '{CF2BEA3C-26EA-32F8-AA9B-331F7E34BA97}'
+          arguments: /install /passive /norestart
 
-- name: Change the hostname to new_hostname
-  win_hostname:
-    name: variable ($Desc)
+      - name: Install windows DotNet 3.5 FrameWork
+        ignore_errors: yes
+        win_feature:
+          name: Net-Framework-Core
+          state: present
 
-- name: Query pagefiles configuration
-  win_pagefile:
-
-- name: Query C pagefile
-  win_pagefile:
-    drive: C
-
-- name: Set C pagefile, override if exists
-  win_pagefile:
-    drive: C
-    initial_size: 8192
-    maximum_size: 8192
-    override: no
-    state: present
-
-- name: Set timezone to 'Central Standard Time' (GMT-06:00)
-  win_timezone:
-    timezone: Central Standard Time
-
-#- name: Install all security, critical, and rollup updates
- # win_updates:
-  #  category_names:
-   #   - SecurityUpdates
-    #  - CriticalUpdates
-     # - UpdateRollups
 
