@@ -81,6 +81,7 @@
         include_management_tools: yes
         source: c:\Windows\sxs
         state: present
+        #
 
 #- name: Set timezone to 'Central Standard Time' (GMT-06:00)
  # win_timezone:
