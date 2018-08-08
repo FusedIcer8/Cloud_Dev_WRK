@@ -3,18 +3,32 @@
   hosts: all
   gather_facts: false
   tasks:
-  
-    - name: Remove installed KB2966828
+
+    - name: PowerShell execution policy = Bypass
       ignore_errors: yes
-      win_hotfix:
-        hotfix_kb: KB2966828
-        state: absent
-      register: hotfix_uninstall
+      win_shell: Set-ExecutionPolicy -ExecutionPolicy Bypass
+
+    - name: Disable 64-bit file system redirection 
+      ignore_errors: yes
+      win_regedit:
+        path: HKLM:\System\CurrentControlSet\Services\msiserver
+        name: WOW64
+        data: "0"
+        type: string
 
     - name: Remove installed KB2966828
       ignore_errors: yes
       win_hotfix:
+        hotfix_kb: KB2966828
+        hotfix_identifier: Package_for_KB2966828~31bf3856ad364e35~amd64~~6.3.1.4
+        state: absent
+      register: hotfix_uninstall
+
+    - name: Remove installed KB2966827
+      ignore_errors: yes
+      win_hotfix:
         hotfix_kb: KB2966827
+        hotfix_identifier: Package_for_KB2966827~31bf3856ad364e35~amd64~~6.2.1.0
         state: absent
       register: hotfix_uninstall
 
@@ -22,6 +36,7 @@
       ignore_errors: yes
       win_hotfix:
         hotfix_kb: KB2966826
+        hotfix_identifier: Package_for_KB2966826~31bf3856ad364e35~amd64~~6.3.1.7
         state: absent
       register: hotfix_uninstall
 
@@ -29,11 +44,23 @@
       ignore_errors: yes
       win_feature:
         name: Net-Framework-Core
+        includ_mangement_tools: yes
         state: present
 
-    - name: Change the hostname to new_hostname
-      win_hostname:
-        name: variable ($Desc)
+    - name: Install the Visual C thingy
+       win_package:
+        path: http://download.microsoft.com/download/1/6/B/16B06F60-3B20-4FF2-B699-5E9B7962F9AE/VSU_4/vcredist_x64.exe
+        product_id: '{CF2BEA3C-26EA-32F8-AA9B-331F7E34BA97}'
+        arguments: /install /passive /norestart
+
+    - name: Install Silverlight
+      win_package:
+        path: https://download.microsoft.com/download/F/D/0/FD0B0093-DE8A-4C4E-BDC4-F0C56D72018C/50907.00/Silverlight_x64.exe
+        state: present
+
+  #  - name: Change the hostname to new_hostname
+   #   win_hostname:
+    #    name: variable ($Desc)
 
     - name: Query pagefiles configuration
       win_pagefile:
@@ -50,9 +77,9 @@
         override: no
         state: present
 
-    - name: Set timezone to 'Central Standard Time' (GMT-06:00)
-      win_timezone:
-        timezone: Central Standard Time
+   # - name: Set timezone to 'Central Standard Time' (GMT-06:00)
+    #  win_timezone:
+     #   timezone: Central Standard Time
 
     #- name: Install all security, critical, and rollup updates
     # win_updates:
