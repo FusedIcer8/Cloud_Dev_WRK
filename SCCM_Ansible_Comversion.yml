@@ -22,7 +22,7 @@
     - name: Uninstall KB:2966827
       ignore_errors: yes
       win_hotfix: 
-        hotfix_kb: KB2966827
+        hotfix_identifier: Package_for_KB2966827~31bf3856ad364e35~amd64~~6.2.1.0
         state: absent
       register: hotfix_uninstall
 
