@@ -3,11 +3,6 @@
   hosts: all
   gather_facts: false
   tasks:
-
-    - name: PowerShell execution policy = Bypass
-      ignore_errors: yes
-      win_shell: Set-ExecutionPolicy -ExecutionPolicy Bypass
-
     - name: Disable 64-bit file system redirection 
       ignore_errors: yes
       win_regedit:
@@ -56,6 +51,8 @@
     - name: Install Silverlight
       win_package:
         path: https://download.microsoft.com/download/F/D/0/FD0B0093-DE8A-4C4E-BDC4-F0C56D72018C/50907.00/Silverlight_x64.exe
+        product_id: '{FD0B0093-DE8A-4C4E-BDC4-F0C56D72018C}'
+        arguments: /install /passive /norestart
         state: present
 
   #  - name: Change the hostname to new_hostname
